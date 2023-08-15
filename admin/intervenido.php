@@ -113,8 +113,8 @@ if ($accion == "ELIMINAR") {
                                                                                                                 echo "value=NUEVO";
                                                                                                             } ?>>
                             <input required type="hidden" class="form-control" name="id_rutasintervenidas" id="id_rutasintervenidas" <?php if ($accion == "EDITAR") {
-                                                                                                                    echo " value='" . $id_rutasintervenidas . "'";
-                                                                                                                } ?>>
+                                                                                                                                            echo " value='" . $id_rutasintervenidas . "'";
+                                                                                                                                        } ?>>
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Elija la ruta</label>
                                 <select class="form-control" id="id_ruta" name="id_ruta">
@@ -139,6 +139,24 @@ if ($accion == "ELIMINAR") {
                                         // Si no hay rutas en la base de datos, mostrar mensaje predeterminado
                                         echo "<option disabled selected>Seleccione la ruta</option>";
                                     }
+                                    $rutas = $db->query("SELECT * FROM ruta");
+                                    foreach ($rutas as $ruta) {
+                                        echo "<option value='{$ruta['id_ruta']}'>{$ruta['descripcion']}</option>";
+                                    }
+
+                                    // Al procesar el formulario, obtenemos el ID de ruta seleccionada
+                                    $id_ruta = $_POST['ruta_seleccionada'];
+
+                                    // Consultamos los árboles de esa ruta
+                                    $arboles = $db->query("SELECT * FROM arboles WHERE id_ruta = $id_ruta");
+
+                                    // Mostramos los árboles en una tabla después del formulario
+                                    if (!empty($arboles)) {
+
+                                        echo "<table>";
+                                        // Código para pintar tabla de árboles
+                                        echo "</table>";
+                                    }
                                     ?>
                                 </select>
                             </div>
@@ -146,7 +164,7 @@ if ($accion == "ELIMINAR") {
                                 <label for="exampleFormControlTextarea1">Descripción de la Intervención</label>
                                 <textarea class="form-control" id="descripcion" name="descripcion" rows="2" style="text-align: left;">
                                 <?php if ($accion == "EDITAR") {
-                                echo $descripcion;
+                                    echo $descripcion;
                                 } ?>
                                 </textarea>
                             </div>
@@ -205,7 +223,7 @@ if ($accion == "ELIMINAR") {
                                         $permitidos = array("image/jpeg", "image/png", "image/gif");
                                         if (in_array($tipo_archivo, $permitidos)) {
                                             // Mover el archivo temporal al directorio de destino
-                                            if (move_uploaded_file($temp_archivo, $directorio_subida .'\\'. $nombre_archivo)) {
+                                            if (move_uploaded_file($temp_archivo, $directorio_subida . '\\' . $nombre_archivo)) {
                                                 // Insertar datos en la base de datos
                                                 $insert = $db->insert('imagen', $data);
                                                 if ($insert) {
@@ -298,7 +316,7 @@ if ($accion == "ELIMINAR") {
                                         echo "<td >" . $val['fecha'] . "</td>";
                                         echo "<td >" . $val['estado'] . "</td>";
                                         echo "<td><img src='/huamanhuasi/imagenes/" . $val['imagen'] . "' width='100' height='100'></td>";
-                                     
+
                                         echo "<td >";
                                         echo "<a href='intervenido.php?accion=EDITAR&id_rutasintervenidas=" . $val['id_rutasintervenidas'] . "'>Editar</a>";
                                         echo "<a href='intervenido.php?accion=ELIMINAR&id_rutasintervenidas=" . $val['id_rutasintervenidas'] . "'>Borrar</a>";

@@ -18,7 +18,6 @@ if (isset($_REQUEST['submit']) and $_REQUEST['submit'] != "") {
 
     if ($accion == "NUEVO") {
         $data = array(
-            'descripcion' => $descripcion,
             'estado' => $estado,
             'fecha' => $fecha,
             'imagen' => $imagen,
@@ -37,7 +36,6 @@ if (isset($_REQUEST['submit']) and $_REQUEST['submit'] != "") {
     if ($accion == "EDITAR") {
         $data_SET = array(
             'id_rutasintervenidas' => $id_rutasintervenidas,
-            'descripcion' => $descripcion,
             'estado' => $estado,
             'fecha' => $fecha,
             'imagen' => $imagen,
@@ -67,7 +65,6 @@ if ($accion == "EDITAR") {
     foreach ($userData as $val) {
 
         $id_rutasintervenidas = $val["id_rutasintervenidas"];
-        $descripcion = $val["descripcion"];
         $estado = $val["estado"];
         $fecha = $val["fecha"];
         $imagen = $val["imagen"];
@@ -139,34 +136,30 @@ if ($accion == "ELIMINAR") {
                                         // Si no hay rutas en la base de datos, mostrar mensaje predeterminado
                                         echo "<option disabled selected>Seleccione la ruta</option>";
                                     }
-                                    $rutas = $db->query("SELECT * FROM ruta");
-                                    foreach ($rutas as $ruta) {
-                                        echo "<option value='{$ruta['id_ruta']}'>{$ruta['descripcion']}</option>";
-                                    }
-
-                                    // Al procesar el formulario, obtenemos el ID de ruta seleccionada
-                                    $id_ruta = $_POST['ruta_seleccionada'];
-
-                                    // Consultamos los árboles de esa ruta
-                                    $arboles = $db->query("SELECT * FROM arboles WHERE id_ruta = $id_ruta");
-
-                                    // Mostramos los árboles en una tabla después del formulario
-                                    if (!empty($arboles)) {
-
-                                        echo "<table>";
-                                        // Código para pintar tabla de árboles
-                                        echo "</table>";
-                                    }
                                     ?>
                                 </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleFormControlTextarea1">Descripción de la Intervención</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="2" style="text-align: left;">
-                                <?php if ($accion == "EDITAR") {
-                                    echo $descripcion;
-                                } ?>
-                                </textarea>
+                                <div class="form-group">
+                                    <label for="id_arbol">Elija el árbol:</label>
+                                    <select class="form-control" id="id_arbol" name="id_arbol">
+                                        <?php
+                                        if (isset($_REQUEST['id_ruta'])) {
+                                            $id_ruta = $_REQUEST['id_ruta'];
+                                            var_dump($_REQUEST['id_ruta']);
+                                            $condition = " AND id_ruta = $id_ruta ";
+                                            $arbolData = $db->getAllRecords('arbol', '*', $condition, ' ORDER BY id_arbol ', ' LIMIT 50');
+                                            if (count($arbolData) > 0) {
+                                                foreach ($arbolData as $arbol) {
+                                                    echo "<option value='" . $arbol['id_arbol'] . "'>" . $arbol['descripcion'] . "</option>";
+                                                }
+                                            } else {
+                                                echo "<option disabled>No hay árboles disponibles en esta ruta</option>";
+                                            }
+                                        } else {
+                                            echo "<option disabled>Primero seleccione una ruta</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Estado del árbol</label>
@@ -286,7 +279,6 @@ if ($accion == "ELIMINAR") {
                                 </form>
                                 <tr>
                                     <th scope="col">id_rutaIntervenida</th>
-                                    <th scope="col">Descripción</th>
                                     <th scope="col">Fecha</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Imagen</th>
@@ -312,7 +304,6 @@ if ($accion == "ELIMINAR") {
                                         $s++;
                                         echo "<tr>";
                                         echo "<th scope='row'>" . $val['id_rutasintervenidas'] . "</th>";
-                                        echo "<td >" . $val['descripcion'] . "</td>";
                                         echo "<td >" . $val['fecha'] . "</td>";
                                         echo "<td >" . $val['estado'] . "</td>";
                                         echo "<td><img src='/huamanhuasi/imagenes/" . $val['imagen'] . "' width='100' height='100'></td>";
